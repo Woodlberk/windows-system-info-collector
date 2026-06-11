@@ -7,12 +7,13 @@ import subprocess
 import ipaddress
 try:
     import winreg
-except ImportError:
+except:
     winreg = None
 try:
     import ctypes
-except ImportError:
+except:
     ctypes = None
+
 
 def get_os_info():
     try:
@@ -29,11 +30,13 @@ def get_os_info():
     except:
         return {'error': 'Failed to get OS info'}
 
+
 def get_hostname():
     try:
         return socket.gethostname()
     except:
         return 'Unknown'
+
 
 def get_drive_list():
     if not ctypes:
@@ -48,6 +51,7 @@ def get_drive_list():
         return drives
     except:
         return []
+
 
 def get_disk_info(drive_letter):
     if not ctypes:
@@ -75,18 +79,23 @@ def get_disk_info(drive_letter):
     except:
         return {'error': 'disk info error'}
 
+
 def format_bytes(bytes_value):
     if bytes_value == 0:
         return "0B"
     size_names = ["B", "KB", "MB", "GB", "TB"]
     i = 0
-    while bytes_value >= 1024 and i < len(size_names) - 1:
+    for j in range(len(size_names)):
+        if bytes_value < 1024 or j == len(size_names) - 1:
+            break
         bytes_value /= 1024.0
-        i += 1
+        i = j + 1 
     if i == 0:
-        return f"{int(bytes_value)}{size_names[i]}"
+        result_str = f"{int(bytes_value)}{size_names[i]}"
     else:
-        return f"{bytes_value:.1f}{size_names[i]}"
+        result_str = f"{bytes_value:.1f}{size_names[i]}"
+    return result_str
+
 
 def get_network_info():
     try:
@@ -102,6 +111,7 @@ def get_network_info():
         return {'hostname': hostname, 'ip_address': ip_address}
     except:
         return {'error': 'network info failed'}
+
 
 def get_tpm_info():
     tpm_info = {'present': False, 'version': 'N/A', 'manufacturer': 'N/A', 'status': 'Unknown'}
@@ -151,6 +161,7 @@ def get_tpm_info():
         tpm_info['error'] = 'TPM info error'
     return tpm_info
 
+
 def get_hotfix_info():
     try:
         hotfixes = []
@@ -169,6 +180,7 @@ def get_hotfix_info():
         return {'count': len(hotfixes), 'recent': limited_hotfixes, 'list': [hf['id'] for hf in limited_hotfixes] if limited_hotfixes else []}
     except:
         return {'error': 'hotfix info failed', 'count': 0, 'recent': [], 'list': []}
+
 
 def generate_full_report():
     report_lines = []
@@ -200,7 +212,13 @@ def generate_full_report():
                 used_str = format_bytes(disk_info['used_bytes'])
                 free_str = format_bytes(disk_info['free_bytes'])
                 percent = disk_info['percent_used']
-                report_lines.append(f"{drive} [{disk_info['filesystem']}] {used_str}/{total_str} used ({percent}%)")
+                drive_part = drive
+                fs_part = f"[{disk_info['filesystem']}]"
+                used_part = used_str
+                total_part = total_str
+                percent_part = f"({percent}%)"
+                line_to_add = drive_part + " " + fs_part + " " + used_part + "/" + total_part + " used " + percent_part
+                report_lines.append(line_to_add)
             else:
                 report_lines.append(f"{drive} [{disk_info.get('error', 'Error')}]")
     else:
@@ -223,7 +241,7 @@ def generate_full_report():
                             ips = re.findall(r'\d+\.\d+\.\d+\.\d+', gateway_line)
                             if ips:
                                 report_lines.append(f"Gateway:     {ips[0]}")
-                            break
+                                break
         except:
             pass
     else:
@@ -258,6 +276,7 @@ def generate_full_report():
     report_lines.append("=" * 26)
     return "\n".join(report_lines)
 
+
 def save_report(content):
     try:
         timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -269,6 +288,7 @@ def save_report(content):
     except:
         print("Error saving report")
         return None
+
 
 def main():
     print("Windows System Information Collector")
@@ -291,6 +311,7 @@ def main():
             input("\nPress Enter to exit...")
         except:
             pass
+
 
 if __name__ == "__main__":
     main()
