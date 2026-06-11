@@ -9,6 +9,9 @@ A simple Python script that collects basic Windows system information and saves 
 4. A timestamped report file (like `system_info_report_20260611_144804.txt`) will be created
 5. Open the .txt file to view your system information
 
+## or
+1. dowload the Release and run the .bat file
+
 ## Example Output
 ```
 WINDOWS SYSTEM INFORMATION
