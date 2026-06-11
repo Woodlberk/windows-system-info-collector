@@ -1,0 +1,2 @@
+@echo off
+python windows_system_info_collector.py
