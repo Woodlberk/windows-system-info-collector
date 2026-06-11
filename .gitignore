@@ -1,0 +1,6 @@
+# Ignore all generated system report files
+system_info_report_*.txt
+
+# Optional: Also ignore any other temporary files you might create
+*.log
+temp/
